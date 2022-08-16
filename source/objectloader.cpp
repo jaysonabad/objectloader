@@ -2,6 +2,7 @@
 /// Author: Jayson B. Abad          ///
 /// Company: Noysoft                ///
 /// Date Started: August 15, 2022   ///
+/// Update: August 16, 2022         ///
 ///////////////////////////////////////
 
 #include <objectloader.h>
@@ -18,163 +19,76 @@
 
 ObjectLDR::ObjectLDR(){}
 
-const char* ObjectLDR::read(std::string filepath)
-{
-  const char* data;
-  std::string temp;
-  std::string line;
 
+floatvector ObjectLDR::parseOBJ(std::string filepath)
+{
+  std::string faces;
+
+  std::string line;
   std::ifstream file(filepath);
   if(file.is_open())
   {
     while(getline(file, line))
     {
-      temp += line + "\n";
-    }
-  }
-  else
-  {
-    std::cout << "error opening the file.." << std::endl;
-  }
-  data = temp.c_str();
-  return data;
-}
-
-void ObjectLDR::parseOBJ(std::string filepath)
-{
-  std::string vertices;
-  std::string normals;
-  std::string textures;
-  std::string indices;
-  const char* data = this->read(filepath);
-  for(int i = 0; i < strlen(data); i++)
-  {
-    // vertices parsing phase
-    if(data[i] == 'v' && data[i+1] == ' ')
-    {
-      std::string v;
-      for(int j = i; data[j] != '\n'; j++)
+      std::istringstream sline(line);
+      std::string temp;
+      while(sline >> temp)
       {
-        if(data[j] != ' ' && data[j] != 'v')
+        if(line[0] == 'v' && line[1] == ' ')
         {
-          v.push_back(data[j]);
-        }
-        else
-        {
-          v.push_back(' ');
-        }
-      }
-      vertices.append(v);
-    }
-    // normals
-    if(data[i] == 'v' && data[i+1] == 'n' && data[i+2] == ' ')
-    {
-      std::string vn;
-      for(int j = i; data[j] != '\n'; j++)
-      {
-        if(data[j] != 'v')
-        {
-          if(data[j] != 'n')
+          if(temp != "v")
           {
-            if(data[j] != ' ')
-            {
-              vn.push_back(data[j]);
-            }
-            else
-            {
-              vn.push_back(' ');
-            }
+            this->v.push_back(stof(temp));
+          }
+        }
+        if(line[0] == 'v' && line[1] == 't')
+        {
+          if(temp != "vt")
+          {
+            this->vt.push_back(stof(temp));
+          }
+        }
+        if(line[0] == 'v' && line[1] =='n')
+        {
+          if(temp != "vn")
+          {
+            this->n.push_back(stof(temp));
+          }
+        }
+        if(line[0] == 'f' && line[1] == ' ')
+        {
+          if(temp != "f")
+          {
+            faces.append(temp+" ");
           }
         }
       }
-      normals.append(vn);
     }
-    // textures
-    if(data[i] == 'v' && data[i+1] == 't' && data[i+2] == ' ')
+  }
+
+  /// parsing faces
+  std::string ftemp;
+
+  for(int i = 0; i < faces.length(); i++)
+  {
+    if(faces[i] != '/')
     {
-      std::string vt;
-      for(int j = i; data[j] != '\n'; j++)
-      {
-        if(data[j] != 'v')
-        {
-          if(data[j] != 't')
-          {
-            if(data[j] != ' ')
-            {
-              vt.push_back(data[j]);
-            }
-            else
-            {
-              vt.push_back(' ');
-            }
-          }
-        }
-      }
-      textures.append(vt);
+      ftemp.push_back(faces[i]);
     }
-    // indices
-    if(data[i] == 'f' && data[i+1] == ' ')
+    else
     {
-      std::string f;
-      for(int j = i; data[j] != '\n'; j++)
-      {
-        if(data[j] != 'f')
-        {
-          if(data[j] != ' ')
-          {
-            if(data[j] != '/')
-            {
-              f.push_back(data[j]);
-            }
-            else
-            {
-              f.push_back(' ');
-            }
-          }
-          else
-          {
-            f.push_back(' ');
-          }
-        }
-      }
-      indices.append(f);
+      ftemp.push_back(' ');
     }
+  }
 
-  }
-  // vertices collection
-  std::istringstream svertices(vertices);
-  std::string vert;
-  while(svertices>>vert)
+  std::istringstream sface(ftemp);
+  std::string face;
+  while(sface >> face)
   {
-    this->v.push_back(stof(vert));
+    this->f.push_back(stoi(face));
   }
-  // normals collection
-  std::istringstream snormals(normals);
-  std::string norm;
-  while(snormals>>norm)
-  {
-    this->n.push_back(stof(norm));
-  }
-  // textures collection
-  std::istringstream stexture(textures);
-  std::string text;
-  while(stexture>>text)
-  {
-    this->vt.push_back(stof(text));
-  }
-  // normals
-  std::istringstream sindices(indices);
-  std::string ind;
-  while(sindices>>ind)
-  {
-    this->f.push_back(stoi(ind));
-  }
-}
 
-void ObjectLDR::parseMTL(std::string filepath){}
-
-floatvector ObjectLDR::processOBJ()
-{
+  /// process the variables
   int k = 0;
   for(int i = 0; i < this->v.size() / 3; i++)
   {
@@ -265,8 +179,11 @@ floatvector ObjectLDR::processOBJ()
       k++;
     }
   }
+
   return this->final;
 }
+
+void ObjectLDR::parseMTL(std::string filepath){}
 
 void ObjectLDR::printOBJData()
 {
@@ -291,12 +208,26 @@ void ObjectLDR::printOBJData()
                               << this->textures[i].y << " "
                               << std::endl;
   }
+}
 
-  std::cout << "Organized Data" << std::endl;
-  for(int i = 0; i < this->final.size(); i++)
-  {
-    std::cout << this->final[i] << std::endl;
-  }
+floatvector ObjectLDR::getV()
+{
+  return this->v;
+}
+
+floatvector ObjectLDR::getN()
+{
+  return this->n;
+}
+
+floatvector ObjectLDR::getVT()
+{
+  return this->vt;
+}
+
+intvector ObjectLDR::getF()
+{
+  return this->f;
 }
 
 ObjectLDR::~ObjectLDR(){}

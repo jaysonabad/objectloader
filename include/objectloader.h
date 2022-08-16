@@ -2,6 +2,7 @@
 /// Author: Jayson B. Abad          ///
 /// Company: Noysoft                ///
 /// Date Started: August 15, 2022   ///
+/// Update: August 16, 2022         ///
 ///////////////////////////////////////
 
 #ifndef OBJECT_LOADER_H
@@ -17,6 +18,7 @@
 typedef glm::vec3 vector3;
 typedef glm::vec2 vector2;
 typedef std::vector<float> floatvector;
+typedef std::vector<int> intvector;
 
 class ObjectLDR
 {
@@ -24,7 +26,7 @@ private:
   floatvector v;
   floatvector n;
   floatvector vt;
-  floatvector f;
+  intvector f;
 
   std::map<int, vector3> vertices;
   std::map<int, vector2> textures;
@@ -36,10 +38,13 @@ public:
   ObjectLDR();
   ~ObjectLDR();
 
-  const char* read(std::string);
-  void parseOBJ(std::string);
+  floatvector parseOBJ(std::string);
   void parseMTL(std::string);
-  floatvector processOBJ();
+
+  floatvector getV();
+  floatvector getN();
+  floatvector getVT();
+  intvector getF();
 
   void printOBJData();
 

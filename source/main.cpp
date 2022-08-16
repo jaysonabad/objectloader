@@ -2,6 +2,7 @@
 /// Author: Jayson B. Abad          ///
 /// Company: Noysoft                ///
 /// Date Started: August 15, 2022   ///
+/// Update: August 16, 2022         ///
 ///////////////////////////////////////
 
 #include <objectloader.h>
@@ -13,16 +14,9 @@ int main()
 
   ObjectLDR objectldr;
 
-  std::vector<float> final;
+  std::vector<float> final = objectldr.parseOBJ("assets/models/stall.obj");
 
-  objectldr.parseOBJ("assets/models/box_stack.obj");
-
-  final = objectldr.processOBJ();
-
-  for(float i: final)
-  {
-    std::cout << i << std::endl;
-  }
+  objectldr.printOBJData();
 
   return 0;
 }
