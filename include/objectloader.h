@@ -36,9 +36,12 @@ private:
   floatvector2 textures;
   floatvector3 normals;
 
-  uintvector index_of_vertices;
-  uintvector index_of_textures;
-  uintvector index_of_normals;
+  floatvector3 indexed_vertices;
+  floatvector2 indexed_textures;
+  floatvector3 indexed_normals;
+
+  uintvector index;
+
 
 public:
   ObjectLDR();
@@ -47,13 +50,12 @@ public:
   void parseOBJ(std::string);
   void parseMTL(std::string);
 
+
   floatvector3 getVertices();
   floatvector2 getTextures();
   floatvector3 getNormals();
 
-  uintvector getIndexOfVertices();
-  uintvector getIndexOfTextures();
-  uintvector getIndexOfNormals();
+  uintvector getIndex();
 
 };
 

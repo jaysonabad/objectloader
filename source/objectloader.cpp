@@ -65,6 +65,33 @@ void ObjectLDR::parseOBJ(std::string filepath)
     }
   }
 
+  /// process the variables
+  for(int i = 0; i < this->v.size(); i+=3)
+  {
+    vector3 v;
+    v.x = this->v[i];
+    v.y = this->v[i+1];
+    v.z = this->v[i+2];
+    this->vertices.push_back(v);
+  }
+
+  for(int i = 0; i < this->vt.size(); i+=2)
+  {
+    vector2 vt;
+    vt.x = this->vt[i];
+    vt.y = 1 - this->vt[i+1];
+    this->textures.push_back(vt);
+  }
+
+  for(int i = 0; i < this->n.size(); i+=3)
+  {
+    vector3 n;
+    n.x = this->n[i];
+    n.y = this->n[i+1];
+    n.z = this->n[i+2];
+    this->normals.push_back(n);
+  }
+
   /// parsing faces
   std::string ftemp;
 
@@ -85,89 +112,15 @@ void ObjectLDR::parseOBJ(std::string filepath)
   int counter = 0;
   while(sface >> faceindex)
   {
-    if(counter == 0)
-    {
-      this->index_of_vertices.push_back(stoi(faceindex) - 1);
-    }
-    if(counter == 1)
-    {
-      this->index_of_textures.push_back(stoi(faceindex) - 1);
-    }
-    if(counter == 2)
-    {
-      this->index_of_normals.push_back(stoi(faceindex) - 1);
-    }
-    counter++;
-    if(counter == 3)
-    {
-      counter = 0;
-    }
+    this->f.push_back(stoi(faceindex) - 1);
   }
 
-  /// process the variables
-  int k = 0;
-  for(int i = 0; i < this->v.size() / 3; i++)
+  for(int i = 0; i < this->f.size(); i+=3)
   {
-    vector3 v = vector3(1.0f);
-    for(int j = 0; j < 3; j++)
-    {
-      if(j == 0)
-      {
-        v.x = this->v[k];
-      }
-      if(j == 1)
-      {
-        v.y = this->v[k];
-      }
-      if(j == 2)
-      {
-        v.z = this->v[k];
-      }
-      k++;
-    }
-    this->vertices.push_back(v);
-  }
-
-  k = 0;
-  for(int i = 0; i < this->n.size() / 3; i++)
-  {
-    vector3 n = vector3(1.0f);
-    for(int j = 0; j < 3; j++)
-    {
-      if(j == 0)
-      {
-        n.x = this->n[k];
-      }
-      if(j == 1)
-      {
-        n.y = this->n[k];
-      }
-      if(j == 2)
-      {
-        n.z = this->n[k];
-      }
-      k++;
-    }
-    this->normals.push_back(n);
-  }
-
-  k = 0;
-  for(int i = 0; i < this->vt.size() / 2; i++)
-  {
-    vector2 vt = vector2(1.0f);
-    for(int j = 0; j < 2; j++)
-    {
-      if(j == 0)
-      {
-        vt.x = this->vt[k];
-      }
-      if(j == 1)
-      {
-        vt.y = this->vt[k];
-      }
-      k++;
-    }
-    this->textures.push_back(vt);
+    this->indexed_vertices.push_back(this->vertices[this->f[i]]);
+    this->indexed_textures.push_back(this->textures[this->f[i+1]]);
+    this->indexed_normals.push_back(this->normals[this->f[i+2]]);
+    this->index.push_back(this->f[i]);
   }
 }
 
@@ -175,32 +128,22 @@ void ObjectLDR::parseMTL(std::string filepath){}
 
 floatvector3 ObjectLDR::getVertices()
 {
-  return this->vertices;
+  return this->indexed_vertices;
 }
 
 floatvector2 ObjectLDR::getTextures()
 {
-  return this->textures;
+  return this->indexed_textures;
 }
 
 floatvector3 ObjectLDR::getNormals()
 {
-  return this->normals;
+  return this->indexed_normals;
 }
 
-uintvector ObjectLDR::getIndexOfVertices()
+uintvector ObjectLDR::getIndex()
 {
-  return this->index_of_vertices;
-}
-
-uintvector ObjectLDR::getIndexOfTextures()
-{
-  return this->index_of_textures;
-}
-
-uintvector ObjectLDR::getIndexOfNormals()
-{
-  return this->index_of_normals;
+  return this->index;
 }
 
 ObjectLDR::~ObjectLDR(){}
