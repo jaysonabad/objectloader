@@ -3,6 +3,7 @@
 /// Company: Noysoft                ///
 /// Date Started: August 15, 2022   ///
 /// Update: August 16, 2022         ///
+/// Update: August 17, 2022         ///
 ///////////////////////////////////////
 
 #include <objectloader.h>
@@ -14,9 +15,7 @@ int main()
 
   ObjectLDR objectldr;
 
-  std::vector<float> final = objectldr.parseOBJ("assets/models/stall.obj");
-
-  objectldr.printOBJData();
+  objectldr.parseOBJ("assets/models/box_stack.obj");
 
   return 0;
 }

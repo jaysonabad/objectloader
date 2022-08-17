@@ -3,6 +3,7 @@
 /// Company: Noysoft                ///
 /// Date Started: August 15, 2022   ///
 /// Update: August 16, 2022         ///
+/// Update: August 17, 2022         ///
 ///////////////////////////////////////
 
 #include <objectloader.h>
@@ -19,11 +20,9 @@
 
 ObjectLDR::ObjectLDR(){}
 
-
-floatvector ObjectLDR::parseOBJ(std::string filepath)
+void ObjectLDR::parseOBJ(std::string filepath)
 {
   std::string faces;
-
   std::string line;
   std::ifstream file(filepath);
   if(file.is_open())
@@ -82,10 +81,27 @@ floatvector ObjectLDR::parseOBJ(std::string filepath)
   }
 
   std::istringstream sface(ftemp);
-  std::string face;
-  while(sface >> face)
+  std::string faceindex;
+  int counter = 0;
+  while(sface >> faceindex)
   {
-    this->f.push_back(stoi(face));
+    if(counter == 0)
+    {
+      this->index_of_vertices.push_back(stoi(faceindex) - 1);
+    }
+    if(counter == 1)
+    {
+      this->index_of_textures.push_back(stoi(faceindex) - 1);
+    }
+    if(counter == 2)
+    {
+      this->index_of_normals.push_back(stoi(faceindex) - 1);
+    }
+    counter++;
+    if(counter == 3)
+    {
+      counter = 0;
+    }
   }
 
   /// process the variables
@@ -109,7 +125,7 @@ floatvector ObjectLDR::parseOBJ(std::string filepath)
       }
       k++;
     }
-    this->vertices[i] = v;
+    this->vertices.push_back(v);
   }
 
   k = 0;
@@ -132,7 +148,7 @@ floatvector ObjectLDR::parseOBJ(std::string filepath)
       }
       k++;
     }
-    this->normals[i] = n;
+    this->normals.push_back(n);
   }
 
   k = 0;
@@ -151,83 +167,40 @@ floatvector ObjectLDR::parseOBJ(std::string filepath)
       }
       k++;
     }
-    this->textures[i] = vt;
+    this->textures.push_back(vt);
   }
-
-  k = 0;
-  for(int i = 0; i < this->f.size() / 3; i++)
-  {
-    for(int j = 0; j < 3; j++)
-    {
-      if(j == 0)
-      {
-        this->final.push_back(this->vertices[this->f[k] - 1].x);
-        this->final.push_back(this->vertices[this->f[k] - 1].y);
-        this->final.push_back(this->vertices[this->f[k] - 1].z);
-      }
-      if(j == 1)
-      {
-        this->final.push_back(this->textures[this->f[k] - 1].x);
-        this->final.push_back(this->textures[this->f[k] - 1].y);
-      }
-      if(j == 2)
-      {
-        this->final.push_back(this->normals[this->f[k] - 1].x);
-        this->final.push_back(this->normals[this->f[k] - 1].y);
-        this->final.push_back(this->normals[this->f[k] - 1].z);
-      }
-      k++;
-    }
-  }
-
-  return this->final;
 }
 
 void ObjectLDR::parseMTL(std::string filepath){}
 
-void ObjectLDR::printOBJData()
+floatvector3 ObjectLDR::getVertices()
 {
-  std::cout << "Vertices" << std::endl;
-  for(int i = 0; i < this->vertices.size(); i++)
-  {
-    std::cout << "Mapped V: " << this->vertices[i].x << " "
-                              << this->vertices[i].y << " "
-                              << this->vertices[i].z << std::endl;
-  }
-  std::cout << "Normals" << std::endl;
-  for(int i = 0; i < this->normals.size(); i++)
-  {
-    std::cout << "mapped vn: " << this->normals[i].x << " "
-                              << this->normals[i].y << " "
-                              << this->normals[i].z << std::endl;
-  }
-  std::cout << "Texture" << std::endl;
-  for(int i = 0; i < this->textures.size(); i++)
-  {
-    std::cout << "mapped vt: " << this->textures[i].x << " "
-                              << this->textures[i].y << " "
-                              << std::endl;
-  }
+  return this->vertices;
 }
 
-floatvector ObjectLDR::getV()
+floatvector2 ObjectLDR::getTextures()
 {
-  return this->v;
+  return this->textures;
 }
 
-floatvector ObjectLDR::getN()
+floatvector3 ObjectLDR::getNormals()
 {
-  return this->n;
+  return this->normals;
 }
 
-floatvector ObjectLDR::getVT()
+uintvector ObjectLDR::getIndexOfVertices()
 {
-  return this->vt;
+  return this->index_of_vertices;
 }
 
-intvector ObjectLDR::getF()
+uintvector ObjectLDR::getIndexOfTextures()
 {
-  return this->f;
+  return this->index_of_textures;
+}
+
+uintvector ObjectLDR::getIndexOfNormals()
+{
+  return this->index_of_normals;
 }
 
 ObjectLDR::~ObjectLDR(){}
