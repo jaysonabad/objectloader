@@ -106,7 +106,8 @@ void ObjectLDR::parseOBJ(std::string filepath)
       ftemp.push_back(' ');
     }
   }
-
+  
+  // processing the faces
   std::istringstream sface(ftemp);
   std::string faceindex;
   int counter = 0;
@@ -114,7 +115,8 @@ void ObjectLDR::parseOBJ(std::string filepath)
   {
     this->f.push_back(stoi(faceindex) - 1);
   }
-
+  
+  // indexing the variables
   for(int i = 0; i < this->f.size(); i+=3)
   {
     this->indexed_vertices.push_back(this->vertices[this->f[i]]);
