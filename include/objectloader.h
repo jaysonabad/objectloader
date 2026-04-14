@@ -31,6 +31,7 @@ private:
   floatvector v;
   floatvector n;
   floatvector vt;
+  uintvector  f;
 
   floatvector3 vertices;
   floatvector2 textures;
