@@ -13,6 +13,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <regex>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -57,7 +58,7 @@ void ObjectLDR::parseOBJ(std::string filepath)
         {
           if(temp != "f")
           {
-            faces.append(temp+" ");
+            faces.append(temp);
           }
         }
       }
@@ -92,40 +93,41 @@ void ObjectLDR::parseOBJ(std::string filepath)
   }
 
   /// parsing faces
-  std::string ftemp;
-
-  for(int i = 0; i < faces.length(); i++)
-  {
-    if(faces[i] != '/')
-    {
-      ftemp.push_back(faces[i]);
-    }
-    else
-    {
-      ftemp.push_back(' ');
+  for(string face : faces) {
+    istringstream sface(regex_replace(face, regex("/"), " "));
+    string f_index;
+    while(sface >> f_index) {
+      this->f.push_back(stoi(f_index) - 1);
     }
   }
   
-  // processing the faces
-  std::istringstream sface(ftemp);
-  std::string faceindex;
-  int counter = 0;
-  while(sface >> faceindex)
-  {
-    this->f.push_back(stoi(faceindex) - 1);
-  }
-  
-  // indexing the variables
+    // indexing the variables
   for(int i = 0; i < this->f.size(); i+=3)
   {
     this->indexed_vertices.push_back(this->vertices[this->f[i]]);
     this->indexed_textures.push_back(this->textures[this->f[i+1]]);
     this->indexed_normals.push_back(this->normals[this->f[i+2]]);
-    this->index.push_back(this->f[i]);
+  }
+  // value of vertices
+  for(int i = 0; i < this->indexed_vertices.size(); i++) {
+    this->vertex_final.push_back(this->indexed_vertices[i].x);
+    this->vertex_final.push_back(this->indexed_vertices[i].y);
+    this->vertex_final.push_back(this->indexed_vertices[i].z);
+    this->vertex_final.push_back(this->indexed_textures[i].x);
+    this->vertex_final.push_back(this->indexed_textures[i].y);
+    this->vertex_final.push_back(this->indexed_normals[i].x);
+    this->vertex_final.push_back(this->indexed_normals[i].y);
+    this->vertex_final.push_back(this->indexed_normals[i].z);
+    this->indices.push_back(i);
   }
 }
 
 void ObjectLDR::parseMTL(std::string filepath){}
+
+floatvector NLoader::get_vertices()
+{
+  return this->vertex_final;
+}
 
 floatvector3 ObjectLDR::getVertices()
 {
@@ -144,7 +146,15 @@ floatvector3 ObjectLDR::getNormals()
 
 uintvector ObjectLDR::getIndex()
 {
-  return this->index;
+  return this->indices;
+}
+
+unsigned int ObjectLDR::get_indices_size() {
+  return this->indices.size();
+}
+
+unsigned int ObjectLDR::get_vertex_size() {
+  return this->vertex_final.size();
 }
 
 ObjectLDR::~ObjectLDR(){}
