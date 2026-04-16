@@ -57,6 +57,9 @@ public:
   floatvector3 getNormals();
 
   uintvector getIndex();
+  uintvector get_indices();
+  unsigned int get_vertex_size();
+  unsigned int get_indices_size();
 
 };
 
