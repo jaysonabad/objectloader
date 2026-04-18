@@ -29,5 +29,5 @@ test:
 	$(build_debug)/$(appname)
 
 clean:
-	del $(build_objects)\*.o
-	del $(build_debug)\*.exe
+	rm -r $(build_objects)\*.o
+	rm -r $(build_debug)\*.exe
