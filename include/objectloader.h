@@ -44,24 +44,17 @@ private:
 
   uintvector index;
 
-
 public:
   ObjectLDR();
   ~ObjectLDR();
-
   void parseOBJ(std::string);
   void parseMTL(std::string);
-
-
-  floatvector3 getVertices();
-  floatvector2 getTextures();
-  floatvector3 getNormals();
-
-  uintvector getIndex();
+  floatvector3 get_vertices();
+  floatvector2 get_textures();
+  floatvector3 get_normals();
   uintvector get_indices();
   unsigned int get_vertex_size();
   unsigned int get_indices_size();
-
 };
 
 #endif
