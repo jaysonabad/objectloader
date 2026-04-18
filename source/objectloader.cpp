@@ -130,22 +130,22 @@ floatvector NLoader::get_vertices()
   return this->vertex_final;
 }
 
-floatvector3 ObjectLDR::getVertices()
+floatvector3 ObjectLDR::get_vertices()
 {
   return this->indexed_vertices;
 }
 
-floatvector2 ObjectLDR::getTextures()
+floatvector2 ObjectLDR::get_textures()
 {
   return this->indexed_textures;
 }
 
-floatvector3 ObjectLDR::getNormals()
+floatvector3 ObjectLDR::get_normals()
 {
   return this->indexed_normals;
 }
 
-uintvector ObjectLDR::getIndex()
+uintvector ObjectLDR::get_indices()
 {
   return this->indices;
 }
